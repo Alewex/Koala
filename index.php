@@ -13,7 +13,7 @@ $k = new Koala\Koala;
  * which can contain storages.
  *
  */
-// $k->newDatabase('KoalaDB');
+$k->newDatabase('KoalaDB');
 
 /**
  *
@@ -21,11 +21,11 @@ $k = new Koala\Koala;
  * You can see storages as tables in SQL.
  *
  */
-// $k->newStorage('Users', 'KoalaDB', [
-// 	'name',
-// 	'age',
-// 	'location'
-// ]);
+$k->newStorage('Users', 'KoalaDB', [
+	'name',
+	'age',
+	'location'
+]);
 // $k->newStorage('Products', 'KoalaDB', [
 // 	'name',
 // 	'description',
