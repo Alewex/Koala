@@ -1,0 +1,3 @@
+# KoalaDB
+[{storage: Users}:[{name: null},{age: null},{location: null}]]
+[{storage: Products}:[{name: null},{description: null},{price: null}]]
