@@ -1,2 +1,3 @@
-# KoalaDB
-storage:Users,columns:[name,age,location],data:[[{name:Alex},{age:null},{location:UK}],[%s]]
+# KoalaDB | Koala
+storage:Test,columns:[id],data:[[%s]]
+storage:Users,columns:[name,age,location],data:[[%s]]
