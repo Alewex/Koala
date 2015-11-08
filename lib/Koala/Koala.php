@@ -151,7 +151,7 @@ class Koala {
 
 		$database = file_get_contents($file);
 
-		if (base64_decode($database)) {
+		if (base64_decode($database, true) == true) {
 			base64_encode($database);
 			return true;
 		} else {
