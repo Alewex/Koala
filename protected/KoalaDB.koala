@@ -1,3 +1,2 @@
 # KoalaDB
-[{storage: Users}:[{name: null},{age: null},{location: null}]]
-[{storage: Products}:[{name: null},{description: null},{price: null}]]
+storage:Users,columns:[name,age,location],data:[[{name:Alex},{age:null},{location:UK}],[{name:Aslex},{age:null},{location:sUK}],[%s]]

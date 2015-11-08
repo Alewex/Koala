@@ -36,4 +36,8 @@ $k = new Koala\Koala;
  * Storing data on storages.
  *
  */
-$k->store(['KoalaDB' => 'Users'], []);
+$k->store(['KoalaDB' => 'Users'], [
+	'name' => 'Alex',
+	'agse' => 17,
+	'location' => 'UK'
+]);
