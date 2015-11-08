@@ -33,7 +33,7 @@ $k = new Koala\Koala;
 // ]);
 /**
  *
- * Storing data om storages.
+ * Storing data on storages.
  *
  */
-$k->store(['KoalaDB' => 'Users']);
+$k->store(['KoalaDB' => 'Users'], []);
