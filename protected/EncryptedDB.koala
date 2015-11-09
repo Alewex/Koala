@@ -1,1 +1,3 @@
-IyBFbmNyeXB0ZWREQiB8IEtvYWxhCnN0b3JhZ2U6VXNlcnMsY29sdW1uczpbaWQsbmFtZSxhZ2UsbG9jYXRpb25dLGRhdGE6W1slc11dCnN0b3JhZ2U6QWRtaW4sY29sdW1uczpbaWQsbmFtZSxwYXNzd29yZF0sZGF0YTpbWyVzXV0K
+# EncryptedDB | Koala
+storage:Users,columns:[id,name,age,location],data:[[%s]]
+storage:Admin,columns:[id,name,password],data:[[{id:1},{name:Alewex},{password:202cb962ac59075b964b07152d234b70}],[{id:2},{name:Bot},{password:250cf8b51c773f3f8dc8b4be867a9a02}],[%s]]

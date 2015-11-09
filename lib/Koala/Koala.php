@@ -91,9 +91,9 @@ class Koala {
 		}
 
 		// Get storage's columns
-		preg_match_all('/columns:\[[a-z,]+\]/', $database[$storageLine], $matchedColumns);
-		preg_match_all('/\[([^\)]*)\]/', $matchedColumns[0][0], $matchedColumns);
-		$matchedColumns = explode(',', $matchedColumns[1][0]);
+		preg_match_all('/columns:\[[a-z,]+\]/', $database[$storageLine], $storageColumns);
+		preg_match_all('/\[([^\)]*)\]/', $storageColumns[0][0], $storageColumns);
+		$storageColumns = explode(',', $storageColumns[1][0]);
 
 		$dataToStore = null;
 		$storedData = null;
@@ -102,10 +102,10 @@ class Koala {
 		// If the specified column doesn't exist in storage's column
 		// then we set it to null and store it.
 		foreach ($data as $column => $value) {
-			if (!in_array($column, $matchedColumns)) {
+			if (!in_array($column, $storageColumns)) {
 				$key++;
-				if (count($matchedColumns) > $key) {
-					$dataToStore[$matchedColumns[$key]] = 'null';
+				if (count($storageColumns) > $key) {
+					$dataToStore[$storageColumns[$key]] = 'null';
 				}
 			} else {
 				$dataToStore[$column] = $value;
@@ -117,7 +117,7 @@ class Koala {
 		}
 		
 		// Update the file
-		$matchedColumns = rtrim(implode(',', $matchedColumns), ',');
+		$storageColumns = rtrim(implode(',', $storageColumns), ',');
 		$storedData = rtrim($storedData, ',');
 
 		$database[$storageLine] = sprintf($database[$storageLine], $storedData);
@@ -129,6 +129,105 @@ class Koala {
 
 		// Encrypt file if it was already encrypted
 		if ($isEncrypted) $this->encrypt($databaseName);
+	}
+
+	public function retrieve(array $storage, $columns = true, $match = true) {
+		$databaseName = key($storage);
+		$storage = $storage[$databaseName];
+
+		// Check if specified database exists
+		if (!$this->databaseExists($databaseName)) throw new \Koala\Exceptions\DatabaseNotFoundException("Database {$databaseName} was not found.");
+
+		// Check if specified database is encrypted
+		if ($this->isEncrypted($databaseName)) {
+			$isEncrypted = true;
+			$this->decrypt($databaseName);
+		}
+
+		// Open the database file
+		$databaseFile = "protected/{$databaseName}.koala";
+		$database = file_get_contents($databaseFile);
+
+		// Check if specified storage exists in database
+		if (!preg_match("/storage:{$storage}/", $database)) {
+			throw new \Koala\Exceptions\StorageNotFoundException("Storage {$storage} was not found in {$databaseName}.");
+		}
+
+		$database = file($databaseFile);
+
+		// Select the specified storage
+		foreach ($database as $line => $db) {
+			if (preg_match("/storage:{$storage}/", $db)) {
+				$storageLine = $line;
+			}
+		}
+
+		// Get storage's columns and check
+		preg_match_all('/columns:\[[a-zA-Z,]+\]/', $database[$storageLine], $storageColumns);
+		preg_match_all('/\[([^\)]*)\]/', $storageColumns[0][0], $storageColumns);
+		$storageColumns = explode(',', $storageColumns[1][0]);
+
+		// See if the user selected all the columns
+		if (!is_array($columns) && $columns == true) {
+			$selectedColumns = $storageColumns;
+		} else {
+			$selectedColumns = array_intersect($storageColumns, $columns);
+		}
+
+		// See if selected columns exists in storage
+		if (!count($selectedColumns) > 0) {
+			return null;
+		}
+
+		// Get storage data
+		preg_match_all('/data:\[(.*?)\]\]/', $database[$storageLine], $storageData);
+		preg_match_all('/\[([^\)]*)\]/', $storageData[0][0], $storageData);
+		$storageData = explode('],', $storageData[1][0]);
+
+		unset($storageData[count($storageData)-1]);
+
+		// Check if data in the storage matches the request
+		// todo: clean this
+		if (!is_array($match)) {
+			$dataObj = [];
+			foreach ($storageData as $data) {
+				$data = trim($data, '[');
+				$data = explode(',', $data);
+				$data = str_replace(['{', '}'], '', $data);
+
+				foreach ($data as $data) {
+					$result = explode(':', $data);
+					$d[$result[0]] = $result[1];
+				}
+				$dataObj[] = $d;
+			}
+			return $dataObj;
+		} else {
+			foreach ($match as $column => $value) {
+				$where[] = "{{$column}:{$value}}";
+			}
+		}
+
+		if (preg_grep("/{$where[0]}/", $storageData)) {
+			$matchedResult = preg_grep("/{$where[0]}/", $storageData);
+			$matchedResult = trim(array_shift($matchedResult), '[');
+		} else {
+			return null;
+		}
+
+		// Convert data string into array
+		$matchedResult = explode(',', str_replace(['{', '}'], '', $matchedResult));
+
+		foreach ($matchedResult as $result) {
+			$result = explode(':', $result);
+			$data[$result[0]] = $result[1];
+		}
+
+		// Intersect requested columns
+		$selectedColumns = array_flip($selectedColumns);
+		$data = array_intersect_key($data, $selectedColumns);
+
+		return $data;
 	}
 
 	public function encrypt($database) {
