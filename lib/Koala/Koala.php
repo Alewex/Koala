@@ -11,13 +11,17 @@ class Koala {
 		return (file_exists("protected/{$name}.koala")) ? true :  false;
 	}
 
-	public function newDatabase($name) {
+	public function newDatabase($name, $encrypted = false) {
 		// Check if database exists
 		if ($this->databaseExists($name)) throw new \Koala\Exceptions\DatabaseNotFoundException("Database {$name} was not found.");
 
 		// Create the database file
 		$database = fopen("protected/{$name}.koala", 'w');
 		fwrite($database, '# ' . $name . " | Koala\n");
+		fclose($database);
+
+		// Encrypt database
+		if ($encrypted) $this->encrypt($name);
 	}
 
 	public function newStorage($name, $databaseName, array $columns) {
@@ -134,6 +138,7 @@ class Koala {
 	public function retrieve(array $storage, $columns = true, $match = true) {
 		$databaseName = key($storage);
 		$storage = $storage[$databaseName];
+		$isEncrypted = false;
 
 		// Check if specified database exists
 		if (!$this->databaseExists($databaseName)) throw new \Koala\Exceptions\DatabaseNotFoundException("Database {$databaseName} was not found.");
@@ -201,6 +206,9 @@ class Koala {
 				}
 				$dataObj[] = $d;
 			}
+			// Encrypt file if it was already encrypted
+			if ($isEncrypted) $this->encrypt($databaseName);
+
 			return $dataObj;
 		} else {
 			foreach ($match as $column => $value) {
@@ -226,6 +234,9 @@ class Koala {
 		// Intersect requested columns
 		$selectedColumns = array_flip($selectedColumns);
 		$data = array_intersect_key($data, $selectedColumns);
+
+		// Encrypt file if it was already encrypted
+		if ($isEncrypted) $this->encrypt($databaseName);
 
 		return $data;
 	}

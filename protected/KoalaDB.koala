@@ -1,3 +1,0 @@
-# KoalaDB | Koala
-storage:Test,columns:[id],data:[[%s]]
-storage:Users,columns:[name,age,location],data:[[%s]]
