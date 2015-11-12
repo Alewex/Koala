@@ -13,7 +13,7 @@ class Koala {
 
 	public function newDatabase($name, $encrypted = false) {
 		// Check if database exists
-		if ($this->databaseExists($name)) throw new \Koala\Exceptions\DatabaseNotFoundException("Database {$name} was not found.");
+		if ($this->databaseExists($name)) throw new \Koala\Exceptions\DatabaseNotFoundException("Database {$name} already exists.");
 
 		// Create the database file
 		$database = fopen("protected/{$name}.koala", 'w');
